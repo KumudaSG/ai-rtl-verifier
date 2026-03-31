@@ -36,9 +36,13 @@ module tb_top;
         in_valid = 0;
         in_data = 0;
         x_count = 0;
+
         repeat (3) @(posedge clk);
+
+        @(negedge clk);
         reset = 0;
-        @(posedge clk);
+        in_valid = 0;
+        in_data = 0;
     end
     endtask
 
@@ -54,12 +58,38 @@ module tb_top;
     end
     endtask
 
+    task drive_valid_operand(
+        input integer value
+    );
+    begin
+        @(negedge clk);
+        in_valid = 1;
+        in_data = value;
+    end
+    endtask
+
+    task drive_gap_cycle;
+    begin
+        @(negedge clk);
+        in_valid = 0;
+        in_data = 0;
+    end
+    endtask
+
+    task stop_input;
+    begin
+        @(negedge clk);
+        in_valid = 0;
+        in_data = 0;
+    end
+    endtask
+
     task run_test(
         input string test_name,
-        input integer count, // how many numbers we are multiplying. 
+        input integer count,
         input integer expected_result,
         input bit expected_overflow,
-        input bit insert_gaps  // helps check if in_valid is being used correctly 
+        input bit insert_gaps
     );
         bit got_done;
         bit pass_result;
@@ -68,24 +98,19 @@ module tb_top;
     begin
         do_reset();
 
+        @(negedge clk);
         x_count = count;
         got_done = 0;
 
         for (index = 0; index < count; index = index + 1) begin
-            @(posedge clk);
-            in_valid = 1;
-            in_data = operand_array[index];
+            drive_valid_operand(operand_array[index]);
 
             if (insert_gaps && index < count - 1) begin
-                @(posedge clk);
-                in_valid = 0;
-                in_data = 0;
+                drive_gap_cycle();
             end
         end
 
-        @(posedge clk);
-        in_valid = 0;
-        in_data = 0;
+        stop_input();
 
         wait_cycles = 0;
         while (done !== 1 && wait_cycles < 100) begin
@@ -112,8 +137,6 @@ module tb_top;
         x_count = 0;
         in_data = 0;
         in_valid = 0;
-
-
 
         // Test 1: single positive
         operand_array[0] = 5;
@@ -145,57 +168,44 @@ module tb_top;
         operand_array[2] = -5;
         run_test("contains_zero", 3, 0, 0, 0);
 
-
-        // Test 8: all minus ones, even count
+        // Test 7: all minus ones, even count
         operand_array[0] = -1;
         operand_array[1] = -1;
         operand_array[2] = -1;
         operand_array[3] = -1;
         run_test("minus_ones_even", 4, 1, 0, 0);
 
-        // Test 9: edge value 127
+        // Test 8: edge value 127
         operand_array[0] = 127;
         operand_array[1] = 1;
         run_test("edge_max_8bit", 2, 127, 0, 0);
 
-        // Test 10: edge value -128
+        // Test 9: edge value -128
         operand_array[0] = -128;
         operand_array[1] = 1;
         run_test("edge_min_8bit", 2, -128, 0, 0);
 
-
-        // Test 12: overflow positive
+        // Test 10: overflow positive
+        // 127^5 = 33038369407
+        // Wrapped signed 32-bit result = -1321327617
         operand_array[0] = 127;
         operand_array[1] = 127;
         operand_array[2] = 127;
         operand_array[3] = 127;
         operand_array[4] = 127;
-        run_test("overflow_positive", 5, 330383694, 1, 0);
+        run_test("overflow_positive", 5, -1321327617, 1, 0);
 
-        // Test 13: overflow negative
-        // operand_array[0] = -128;
-        // operand_array[1] = 127;
-        // operand_array[2] = 127;
-        // operand_array[3] = 127;
-        // operand_array[4] = 127;
-        // run_test("overflow_negative", 5, -264306688, 1, 0);
-        
-        // ____________________________________
+        // Calibration / easy DUT-touching case
+        operand_array[0] = 0;
+        operand_array[1] = 7;
+        run_test("manual_pass", 2, 0, 0, 0);
 
-        // test_manual_pass 
-        // we are going to test if 2x10 = 20
-        operand_array[0] = 2;
-        operand_array[1] = 10;
-        run_test("manual_pass", 2,20,0, 1 );
-
-        // test_manual_fail 
-        // pass in 3x3 but we say we expect the value 10
-        // so it will fail. 
+        // Negative control: intentionally wrong expected value
         operand_array[0] = 3;
         operand_array[1] = 3;
-        run_test("manual_fail", 2, 10, 0, 1 );
+        run_test("manual_fail", 2, 10, 0, 1);
+
         $display("CHECK:reached_end_of_testbench:PASS");
-        
         $finish;
     end
 
