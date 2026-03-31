@@ -125,7 +125,7 @@ module tb_top;
         in_data = 0;
         in_valid = 0;
 
-        // Test 1: simplest possible case
+        // Test 1: simplest positive case
         // 5 -> 5
         do_reset();
         x_count = 1;
@@ -133,7 +133,34 @@ module tb_top;
         stop_input();
         check_outputs("single_positive", 5, 0);
 
-        // Test 2: zero should force product to zero
+        // Test 2: simplest negative case
+        // -7 -> -7
+        do_reset();
+        x_count = 1;
+        send_operand(-7);
+        stop_input();
+        check_outputs("single_negative", -7, 0);
+
+        // Test 3: two positive operands
+        // 3 * 4 = 12
+        do_reset();
+        x_count = 2;
+        send_operand(3);
+        send_operand(4);
+        stop_input();
+        check_outputs("two_positive", 12, 0);
+
+        // Test 4: mixed sign operands
+        // 2 * -3 * 4 = -24
+        do_reset();
+        x_count = 3;
+        send_operand(2);
+        send_operand(-3);
+        send_operand(4);
+        stop_input();
+        check_outputs("mixed_sign", -24, 0);
+
+        // Test 5: zero should force product to zero
         // 9 * 0 * -5 = 0
         do_reset();
         x_count = 3;
@@ -142,6 +169,15 @@ module tb_top;
         send_operand(-5);
         stop_input();
         check_outputs("contains_zero", 0, 0);
+
+        // Test 6: edge signed value
+        // -128 * 1 = -128
+        do_reset();
+        x_count = 2;
+        send_operand(-128);
+        send_operand(1);
+        stop_input();
+        check_outputs("edge_min_8bit", -128, 0);
 
         $display("CHECK:reached_end_of_testbench:PASS");
         $finish;
