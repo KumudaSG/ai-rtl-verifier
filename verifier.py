@@ -42,7 +42,15 @@ def verify():
                 print(line, end="")
                 full_output += line
 
-        process.wait()
+        try:
+            process.wait(timeout=60)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            return {
+                "pass": False,
+                "details": {},
+                "reason": "Simulation timed out"
+            }
 
         checks = parse_checks(full_output)
 
@@ -62,7 +70,7 @@ def verify():
             reason = "Failed checks: " + ", ".join(failed_checks)
 
         return {
-            "pass": overall_pass,
+            "overall pass": overall_pass,
             "details": checks,
             "reason": reason
         }
