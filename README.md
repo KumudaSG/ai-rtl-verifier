@@ -24,10 +24,20 @@ LLM generates RTL (top.sv, control.sv, datapath.sv) Python writes files to disk 
 
 Testbench prints:
 
-CHECK::PASS/FAIL Python parses results and evaluates correctness
+CHECK::PASS/FAIL 
+
+Python parses results and evaluates correctness
 
 ---
 
+How to run?
+---
+
+'''python pipeline.py''' 
+- to run a single instance
+
+
+---
 Project timeline:
 ---
 
