@@ -51,7 +51,7 @@ We will do two types of evaluation, one will be a baseline evaluation for proble
 
 ---
 
-Referenches and inrpirations:
+References and inspirations:
 1. [Spec2rtl](https://research.nvidia.com/publication/2025-06_spec2rtl-agent-automated-hardware-code-generation-complex-specifications-using)
 2. [Evaluation Frameworks](https://www.evidentlyai.com/blog/llm-evaluation-framework)
 ---
