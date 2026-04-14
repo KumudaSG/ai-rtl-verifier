@@ -259,7 +259,7 @@ def build_tcl_script(
     tcl_lines.append("update_compile_order -fileset sources_1")
     tcl_lines.append("update_compile_order -fileset sim_1")
     tcl_lines.append("launch_simulation")
-    tcl_lines.append("run all")
+    #tcl_lines.append("run all")
     tcl_lines.append("close_sim")
     tcl_lines.append("close_project")
     tcl_lines.append("quit")
