@@ -153,7 +153,7 @@ Return a structured solution matching the schema.
 You are generating a complete SystemVerilog RTL solution for Problem P3.
 
 Task:
-Design and implement a finite state machine-based sequential multiplier that multiplies two signed 8-bit, 2's complement numbers using a shift-and-add algorithm over multiple clock cycles.
+Design and implement a finite state machine-based SystemVerilog design that counts how many times an input pulse is received. The design should increment its count only on cycles where in_valid is high and pulse_in is 1. Once the count reaches a target value, the module should assert a done signal.
 
 The solution must include exactly 3 RTL files:
 1. top.sv
@@ -162,36 +162,47 @@ The solution must include exactly 3 RTL files:
 
 Architecture requirements:
 - Split the implementation into exactly 2 modules excluding the top-level module:
-  1. Control: FSM and sequencing
-  2. Datapath: shifting, addition, sign handling, and storage
-- Do not use the built-in multiplication operator * for the main multiply behavior.
-- The top-level module must instantiate both modules and only wire them together.
+  1. Control: implements the FSM and control logic
+  2. Datapath: stores the running count and performs comparisons
+- The top-level module must instantiate both modules and only connect them.
+- The control and datapath responsibilities must be separate.
 
 Top-level interface requirements:
 The top module must be named `top` and must include exactly these signals:
 - input logic clk
 - input logic reset
-- input logic start
-- input logic signed [7:0] A
-- input logic signed [7:0] B
-- output logic signed [15:0] result
+- input logic [7:0] target_count
+- input logic pulse_in
+- input logic in_valid
+- output logic [7:0] count
 - output logic done
-- output logic busy
-- output logic overflow
 
 Behavior requirements:
-- Computation begins when start is asserted while idle.
-- busy must remain high while computation is in progress.
-- done must assert when the result is ready.
-- The multiplication must be performed iteratively using shift-and-add style logic.
-- Correctly handle signed operands.
-- Include comments describing sign extension, shift direction, cycle behavior, and overflow handling.
+- Count only cycles where in_valid = 1 and pulse_in = 1.
+- Ignore pulse_in completely when in_valid = 0.
+- count must increment by exactly 1 per valid pulse.
+- done must assert when count reaches target_count.
+- reset is active high and must clear the count and state.
+- Include comments explaining how valid gating works, when count increments, and how done behaves after completion.
 
 Output requirements:
 Return a structured solution matching the schema.
 - top_module_name, control_module_name, datapath_module_name must be provided
 - top_file, control_file, datapath_file must all be provided
 - assumptions_summary must be provided
+
+STRICT RTL RULES (VERY IMPORTANT):
+
+- Each signal must be driven by exactly one process.
+- Do NOT drive the same signal from multiple always blocks.
+- next_state must ONLY be assigned in a single always_comb block.
+- state must ONLY be updated in a single always_ff block.
+- done must be driven from exactly one always block (not both combinational and sequential).
+- Do NOT mix blocking and non-blocking assignments for the same signal.
+- Control module must follow this structure:
+    - always_ff for state register
+    - always_comb for next_state logic
+
 """,
 
     "P4": """
