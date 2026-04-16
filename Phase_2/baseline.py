@@ -94,10 +94,141 @@ For this problem:
 - datapath_file should be null
 - top_module_name must be provided
 - assumptions_summary must be provided
-""",
 
+The top module must be named top_p1.
+The control module must be named control_p1.
+The datapath module must be named datapath_p1.
+""",
     "P2": """
 You are generating a complete SystemVerilog RTL solution for Problem P2.
+
+Task:
+Design and implement a finite state machine-based SystemVerilog design that computes the running sum of x_count number of signed 8-bit, two's complement inputs. The final result shall be produced as a signed 16-bit output.
+
+A “running sum” means the design keeps an internal accumulator register. Each time a valid input arrives, that input is added to the accumulator, and the accumulator stores the updated partial sum.
+
+Example:
+If x_count = 4 and the valid input sequence is: 3, -2, 7, 1
+Then the accumulator evolves as:
+- start: 0
+- after 3: 3
+- after -2: 1
+- after 7: 8
+- after 1: 9
+Final result = 9
+
+The solution must include exactly 3 RTL files:
+1. top.sv
+2. control.sv
+3. datapath.sv
+
+Architecture requirements:
+- The implementation must be split into exactly 2 modules excluding the top-level module:
+  1. Control module: implements the FSM and control logic
+  2. Datapath module: performs arithmetic operations and stores the running sum
+- The top-level module must instantiate both the control module and the datapath module and connect them correctly.
+- The top-level module must act only as an integration and wiring module.
+- The control and datapath modules must have distinct responsibilities.
+- Do not leave either submodule empty.
+- Control should decide when inputs are accepted, when the datapath adds, and when computation is complete.
+- Datapath should store the accumulator and any internal registers.
+
+Top-level interface requirements:
+The top module must be named `top_p2` and must include exactly these signals:
+- input logic clk
+- input logic reset
+- input logic [7:0] x_count
+- input logic signed [7:0] in_data
+- input logic in_valid
+- output logic signed [15:0] result
+- output logic done
+
+Input protocol requirements:
+- in_data carries one signed 8-bit operand at a time.
+- in_valid indicates whether the value on in_data is valid.
+- Only sample in_data when in_valid = 1.
+- Ignore in_data completely when in_valid = 0.
+- Count only accepted operands (cycles where in_valid = 1).
+- Process exactly x_count valid operands.
+- Valid inputs may have gaps between them (cycles where in_valid = 0).
+
+Behavior requirements:
+- The running sum must start at 0 after reset.
+- The datapath must add each accepted operand to the running sum.
+- The accumulator must update ONLY when in_valid = 1.
+- The internal operand counter must increment ONLY when in_valid = 1.
+- The computation completes only after exactly x_count valid operands are processed.
+- done must go high ONLY after exactly x_count valid operands are processed.
+- done must NOT go high early.
+- result must hold the final 16-bit signed sum after completion.
+- After done = 1, the result may remain constant until reset.
+- reset is active high and must clear:
+  - accumulator
+  - operand counter
+  - FSM state
+  - done signal
+
+Assumptions:
+- Assume x_count >= 1
+- No separate overflow signal is required
+- If the sum exceeds 16-bit range, allow normal 2’s complement wraparound and document it
+
+STRICT RTL RULES (VERY IMPORTANT):
+- Each signal must be driven by exactly one process
+- Do NOT drive the same signal from multiple always blocks
+- next_state must ONLY be assigned in one always_comb block
+- state must ONLY be assigned in one always_ff block
+- done must be driven from exactly one process
+- Do NOT mix blocking and non-blocking assignments for the same signal
+- Control module structure MUST be:
+  - one always_ff for state register
+  - one always_comb for next_state and control signals
+- Use synthesizable SystemVerilog only
+- Do NOT use vendor IP, DPI, classes, or non-synthesizable constructs
+
+Output requirements:
+Return a structured solution matching the schema.
+- top_module_name, control_module_name, datapath_module_name must be provided
+- top_file, control_file, datapath_file must all be provided
+- assumptions_summary must be provided
+
+The top module must be named `top_p2`
+The control module must be named `control_p2`
+The datapath module must be named `datapath_p2`
+
+Do not return pseudocode.
+Do not omit module bodies.
+Do not collapse everything into the top module.
+Do not leave control or datapath empty.
+
+Accumulator semantics (VERY IMPORTANT):
+- The datapath must contain a register that stores the running sum.
+- That running sum register must be initialized to 0 on reset.
+- On each cycle where an input is accepted (in_valid = 1 and computation is not yet complete), the datapath must update:
+    running_sum <= running_sum + sign_extended(in_data)
+- The running sum must NOT be cleared between accepted inputs.
+- The running sum must preserve its value across gap cycles where in_valid = 0.
+- The final result output must reflect the running sum register after all x_count valid inputs have been accepted.
+
+Signed arithmetic requirements (VERY IMPORTANT):
+- in_data is a signed 8-bit two's complement value.
+- Before addition, in_data must be treated as a signed value and sign-extended to the accumulator width.
+- The running sum register and result must be signed 16-bit values.
+- Do NOT treat in_data as unsigned during addition.
+
+Control/datapath interaction requirements:
+- The control module must generate an explicit add_enable signal.
+- add_enable must go high only when a valid input is being accepted.
+- The datapath must update the accumulator only when add_enable = 1.
+- The datapath must not independently decide when to count or add.
+- The control module must generate or coordinate the operand counter.
+- The operand counter must increment exactly when add_enable = 1.
+
+
+""",
+
+    "P3": """
+You are generating a complete SystemVerilog RTL solution for Problem P3.
 
 Task:
 Design and implement a finite state machine-based SystemVerilog design to multiply x_count number of 8-bit signed two's complement numbers. The final result shall be produced as a signed 32-bit output.
@@ -127,6 +258,9 @@ The top module must be named `top` and must include exactly these signals:
 - output logic overflow
 - output logic done
 
+The top module must be named `top_p3`
+The control module must be named `control_p3`
+The datapath module must be named `datapath_p3`
 Input protocol requirements:
 - in_data carries one signed 8-bit operand at a time.
 - in_valid indicates whether the value currently present on in_data is valid and should be consumed.
@@ -147,10 +281,26 @@ Return a structured solution matching the schema.
 - top_module_name, control_module_name, datapath_module_name must be provided
 - top_file, control_file, datapath_file must all be provided
 - assumptions_summary must be provided
+
+STRICT RTL RULES (VERY IMPORTANT):
+- Each signal must be driven by exactly one process.
+- Do NOT drive the same signal from multiple always blocks.
+- next_state must ONLY be assigned in a single always_comb block.
+- state must ONLY be updated in a single always_ff block.
+- done must be driven from exactly one process.
+- Do NOT mix blocking and non-blocking assignments for the same signal.
+- Control module must follow this structure:
+    - always_ff for state register
+    - always_comb for next_state logic
+
+
+The top module must be named top_p3.
+The control module must be named control_p3.
+The datapath module must be named datapath_p3.
 """,
 
-    "P3": """
-You are generating a complete SystemVerilog RTL solution for Problem P3.
+    "P4": """
+You are generating a complete SystemVerilog RTL solution for Problem P4.
 
 Task:
 Design and implement a finite state machine-based SystemVerilog design that counts how many times an input pulse is received. The design should increment its count only on cycles where in_valid is high and pulse_in is 1. Once the count reaches a target value, the module should assert a done signal.
@@ -203,10 +353,19 @@ STRICT RTL RULES (VERY IMPORTANT):
     - always_ff for state register
     - always_comb for next_state logic
 
+The top module must be named top_p4.
+The control module must be named control_p4.
+The datapath module must be named datapath_p4.
+
+Before finalizing the solution, verify the following:
+- There is no combinational path control_output -> datapath_status -> same control_output.
+- Every datapath status signal is a pure function of registered datapath state and legal datapath inputs.
+- Every control output is a pure function of FSM state, external inputs, and stable datapath status.
+
 """,
 
-    "P4": """
-You are generating a complete SystemVerilog RTL solution for Problem P4.
+    "P5": """
+You are generating a complete SystemVerilog RTL solution for Problem P5.
 
 Task:
 Design and implement an 8-entry FIFO buffer with 8-bit data width using SystemVerilog.
@@ -250,58 +409,10 @@ Return a structured solution matching the schema.
 - top_module_name, control_module_name, datapath_module_name must be provided
 - top_file, control_file, datapath_file must all be provided
 - assumptions_summary must be provided
-""",
 
-    "P5": """
-You are generating a complete SystemVerilog RTL solution for Problem P5.
-
-Task:
-Design and implement a 2-stage pipelined ALU that performs arithmetic and logic operations on signed 8-bit inputs. The output must appear exactly 2 clock cycles after a valid input is accepted.
-
-The solution must include exactly 3 RTL files:
-1. top.sv
-2. control.sv
-3. datapath.sv
-
-Architecture requirements:
-- Split into exactly 2 modules excluding the top-level module:
-  1. Control: pipeline control and valid propagation
-  2. Datapath: operations and pipeline stage storage
-- The top-level module must instantiate both modules and only connect them.
-
-Supported operations:
-- 2'b00: add
-- 2'b01: subtract
-- 2'b10: bitwise AND
-- 2'b11: bitwise OR
-
-Top-level interface requirements:
-The top module must be named `top` and must include exactly these signals:
-- input logic clk
-- input logic reset
-- input logic in_valid
-- input logic signed [7:0] A
-- input logic signed [7:0] B
-- input logic [1:0] Op
-- output logic signed [7:0] result
-- output logic overflow
-- output logic out_valid
-
-Behavior requirements:
-- Implement a true 2-stage pipeline.
-- An input is accepted only when in_valid is high.
-- out_valid must assert exactly 2 cycles after an accepted input.
-- result must correspond to the correct operation.
-- overflow must be correct for add and subtract.
-- overflow must remain 0 for AND and OR.
-- The design must support back-to-back valid inputs on consecutive cycles.
-- Include comments explaining pipeline stage partitioning and valid timing.
-
-Output requirements:
-Return a structured solution matching the schema.
-- top_module_name, control_module_name, datapath_module_name must be provided
-- top_file, control_file, datapath_file must all be provided
-- assumptions_summary must be provided
+The top module must be named top_p5.
+The control module must be named control_p5.
+The datapath module must be named datapath_p5.
 """
 }
 
