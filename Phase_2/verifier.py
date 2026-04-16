@@ -2,7 +2,7 @@ import os
 import re
 import subprocess
 from typing import List, Optional, Dict, Any
-
+import time
 from pydantic import BaseModel
 
 
@@ -238,18 +238,21 @@ def write_solution_files(problem_id: str, solution: RTLSolution) -> List[str]:
     return written_files
 
 
+
 def build_tcl_script(
     problem_id: str,
     rtl_filenames: List[str],
     testbench_file: str,
     top_tb_module: str
 ) -> str:
-    project_name = f"{problem_id.lower()}_proj"
-    project_dir = f"./{project_name}"
+    run_id = str(int(time.time()))  # simple unique ID
+    project_name = f"{problem_id.lower()}_{run_id}_proj"
+    project_dir = f"./runs/{project_name}"
 
     tcl_lines = []
 
-    tcl_lines.append(f"create_project {project_name} {project_dir} -part xc7a35ticsg324-1L -force")
+    tcl_lines.append(f"file mkdir ./runs")
+    tcl_lines.append(f"create_project {project_name} {project_dir} -part xc7a35ticsg324-1L")
 
     for rtl_filename in rtl_filenames:
         tcl_lines.append(f"add_files {rtl_filename}")
@@ -259,7 +262,6 @@ def build_tcl_script(
     tcl_lines.append("update_compile_order -fileset sources_1")
     tcl_lines.append("update_compile_order -fileset sim_1")
     tcl_lines.append("launch_simulation")
-    #tcl_lines.append("run all")
     tcl_lines.append("close_sim")
     tcl_lines.append("close_project")
     tcl_lines.append("quit")
