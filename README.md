@@ -25,7 +25,7 @@ The system connects three components into a closed loop:
      ```
    - Python parses logs and determines correctness
 
-4. **Self-Refinement Loop **
+4. **Self-Refinement Loop**
    - LLM receives failure feedback
    - Iteratively improves RTL
 
@@ -34,36 +34,49 @@ The system connects three components into a closed loop:
 Setup:
 ---
 
-Files setup:
-
-Download all the files
-
-Create 4 new files with names: top.sv, tb_top.sv, control.sv, datapath.sv since these are the files that the LLM populates.
-
 Ensure vivado verion 2022.2 is downloaded and check in verifier.py if the path is the same.
 
 pip install the following packages: openai==1.30.0 instructor==1.3.3 pydantic==2.7.1 python-dotenv==1.0.1
 
 Create a .env file in the root directory and add it with OPENROUTER_API_KEY=your_api_key_here
 
-How the System Works:
-
-LLM generates RTL (top.sv, control.sv, datapath.sv) Python writes files to disk Vivado runs simulation via test.tcl
-
-Testbench prints:
-
-CHECK::PASS/FAIL 
-
-Python parses results and evaluates correctness
-
 ---
 
-How to run?
+##How to run?
 ---
+This repository is organized by phase, with each stage kept in its own folder.
+The setup and execution flow are slightly different in each phase.
 
-'''python pipeline.py''' 
-- to run a single instance
+**Phase 1**
+In Phase 1, the LLM generates and populates the RTL design files, but the required file structure must already exist.
 
+#### What you need before running
+- Python installed
+- Vivado 2022.2 installed
+- Required Python packages installed
+- A valid `.env` file with your OpenRouter API key
+- The following empty files created in the Phase 1 folder:
+  - `top.sv`
+  - `control.sv`
+  - `datapath.sv`
+- A valid testbench file: you as the user must add tests in this file for the vivado simulation to run. 
+- A valid TCL script for simulation.
+
+**Phase 2**
+In Phase 2, the pipeline is more automated. You only need to provide a testbench file for each problem with the format eg: tb_p1.sv
+
+If you want to make changes to the problems, the prompts are in pipeline.py. 
+
+The system automatically generates:
+
+top.sv
+control.sv
+datapath.sv
+the TCL simulation script
+
+
+---
+# How the system works?
 
 ---
 Project timeline:
