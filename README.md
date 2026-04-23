@@ -80,30 +80,30 @@ The system automatically generates:
 ```mermaid
 flowchart TD
 
-A[Problem Specification\n(Testbench)] --> B[LLM Generates RTL\n(top, control, datapath)]
+A[Problem Specification<br>Testbench] --> B[LLM Generates RTL<br>top control datapath]
 
-B --> C[Write RTL Files to Disk]
+B --> C[Write RTL Files]
 
 C --> D[Simulation Engine]
-D -->|Phase 1| D1[Vivado (TCL Batch)]
-D -->|Phase 2| D2[Verilator]
+
+D --> D1[Vivado Batch Mode]
+D --> D2[Verilator]
 
 D1 --> E[Testbench Execution]
 D2 --> E[Testbench Execution]
 
-E --> F[Structured Output\nCHECK:PASS / FAIL]
+E --> F[CHECK PASS FAIL Output]
 
-F --> G[Python Verifier\n(Parse Results)]
+F --> G[Python Verifier]
 
-G --> H{All Tests Pass?}
+G --> H{All Tests Pass}
 
-H -->|Yes| I[Final Output\nCorrect Design]
+H -->|Yes| I[Final Correct Design]
 
-H -->|No| J[Failure Feedback\n(Error + Failed Checks)]
+H -->|No| J[Failure Feedback]
 
 J --> K[LLM Refinement]
-
-K --> B 
+ 
 ```
 ---
 Project timeline:
