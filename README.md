@@ -43,7 +43,6 @@ Create a .env file in the root directory and add it with OPENROUTER_API_KEY=your
 ---
 
 ## How to run?
----
 This repository is organized by phase, with each stage kept in its own folder.
 The setup and execution flow are slightly different in each phase.
 
