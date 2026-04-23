@@ -78,31 +78,21 @@ The system automatically generates:
 ## How the System Works
 
 ```mermaid
-flowchart TD
+flowchart LR
 
-A[Problem Specification<br>Testbench] --> B[LLM Generates RTL<br>top control datapath]
+A[Testbench] --> B[LLM]
+B --> C[RTL]
+C --> D[Sim]
 
-B --> C[Write RTL Files]
+D --> E[Exec]
+E --> F[Results]
 
-C --> D[Simulation Engine]
+F --> G{Pass}
 
-D --> D1[Vivado Batch Mode]
-D --> D2[Verilator]
+G -->|Yes| H[Done]
+G -->|No| I[Feedback]
 
-D1 --> E[Testbench Execution]
-D2 --> E[Testbench Execution]
-
-E --> F[CHECK PASS FAIL Output]
-
-F --> G[Python Verifier]
-
-G --> H{All Tests Pass}
-
-H -->|Yes| I[Final Correct Design]
-
-H -->|No| J[Failure Feedback]
-
-J --> K[LLM Refinement]
+I --> B
  
 ```
 ---
