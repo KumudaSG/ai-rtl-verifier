@@ -47,6 +47,7 @@ This repository is organized by phase, with each stage kept in its own folder.
 The setup and execution flow are slightly different in each phase.
 
 **Phase 1**
+
 In Phase 1, the LLM generates and populates the RTL design files, but the required file structure must already exist.
 
 #### What you need before running
@@ -62,29 +63,56 @@ In Phase 1, the LLM generates and populates the RTL design files, but the requir
 - A valid TCL script for simulation.
 
 **Phase 2**
-In Phase 2, the pipeline is more automated. You only need to provide a testbench file for each problem with the format eg: tb_p1.sv
+
+In Phase 2, the pipeline is more automated. You only need to provide a testbench file for each problem with the format tb_pn.sv
 
 If you want to make changes to the problems, the prompts are in pipeline.py. 
 
 The system automatically generates:
-
-top.sv
-control.sv
-datapath.sv
-the TCL simulation script
-
+  - `top_pn.sv`
+  - `control_pn.sv`
+  - `datapath_pn.sv`
+  - `test_pn.tcl`
 
 ---
-## How the system works?
+## How the System Works
 
+```mermaid
+flowchart TD
+
+A[Problem Specification\n(Testbench)] --> B[LLM Generates RTL\n(top, control, datapath)]
+
+B --> C[Write RTL Files to Disk]
+
+C --> D[Simulation Engine]
+D -->|Phase 1| D1[Vivado (TCL Batch)]
+D -->|Phase 2| D2[Verilator]
+
+D1 --> E[Testbench Execution]
+D2 --> E[Testbench Execution]
+
+E --> F[Structured Output\nCHECK:PASS / FAIL]
+
+F --> G[Python Verifier\n(Parse Results)]
+
+G --> H{All Tests Pass?}
+
+H -->|Yes| I[Final Output\nCorrect Design]
+
+H -->|No| J[Failure Feedback\n(Error + Failed Checks)]
+
+J --> K[LLM Refinement]
+
+K --> B 
+```
 ---
 Project timeline:
 ---
 
-Phase 1:
+Phase 1 (Core pipeline):
 Building a Simulation-Based Automatic Verifier, LLM API Pipeline with Enforced Structured Output and a self-refinement loop where the LLM iteratively refines its own solution based on verifier feedback.
 
-Phase 2 (Tool augmentation)
+Phase 2 (Tool augmentation):
 Expand the scope of the LLM pipeline by integrating various difficulty levels of problems and implementing tool integration. 
 
 We evaluate the system in two modes: a baseline setting that measures raw LLM performance, and a tool-augmented setting that incorporates external verification.
