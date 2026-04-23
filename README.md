@@ -3,6 +3,34 @@ This project explores how large language models (LLMs) can be used to generate F
 
 ---
 
+## Overview
+
+The system connects three components into a closed loop:
+
+1. **LLM Generation**
+   - Generates SystemVerilog modules:
+     - `top.sv`
+     - `control.sv`
+     - `datapath.sv`
+
+2. **Simulation-Based Verification**
+   - Runs testbenches in Vivado (2022.2) using batch mode
+   - Executed via `test.tcl`
+
+3. **Automated Evaluation**
+   - Testbench outputs structured signals:
+     ```
+     CHECK:<test_name>:PASS
+     CHECK:<test_name>:FAIL
+     ```
+   - Python parses logs and determines correctness
+
+4. **Self-Refinement Loop **
+   - LLM receives failure feedback
+   - Iteratively improves RTL
+
+---
+
 Setup:
 ---
 
@@ -47,13 +75,15 @@ Building a Simulation-Based Automatic Verifier, LLM API Pipeline with Enforced S
 Phase 2:
 Expand the scope of the LLM pipeline by integrating various difficulty levels of problems and implementing tool integration. 
 
-We will do two types of evaluation, one will be a baseline evaluation for problems and next would be a Tool Augmented Evaluation. 
+We evaluate the system in two modes: a baseline setting that measures raw LLM performance, and a tool-augmented setting that incorporates external verification.
+Verilator is used in the augmented setting to provide faster, scriptable simulation, enabling quicker feedback and more efficient refinement of generated RTL.
 
 ---
 
 References and inspirations:
 1. [Spec2rtl](https://research.nvidia.com/publication/2025-06_spec2rtl-agent-automated-hardware-code-generation-complex-specifications-using)
 2. [Evaluation Frameworks](https://www.evidentlyai.com/blog/llm-evaluation-framework)
+3. [Verilator](https://github.com/verilator/verilator)
 ---
 
 
