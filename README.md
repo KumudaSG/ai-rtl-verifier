@@ -42,7 +42,7 @@ Create a .env file in the root directory and add it with OPENROUTER_API_KEY=your
 
 ---
 
-##How to run?
+## How to run?
 ---
 This repository is organized by phase, with each stage kept in its own folder.
 The setup and execution flow are slightly different in each phase.
@@ -76,20 +76,24 @@ the TCL simulation script
 
 
 ---
-# How the system works?
+## How the system works?
 
 ---
 Project timeline:
 ---
 
 Phase 1:
-Building a Simulation-Based Automatic Verifier, LLM API Pipeline with Enforced Structured Output and a self-verification loop where the LLM iteratively refines its own solution based on verifier feedback.
+Building a Simulation-Based Automatic Verifier, LLM API Pipeline with Enforced Structured Output and a self-refinement loop where the LLM iteratively refines its own solution based on verifier feedback.
 
-Phase 2:
+Phase 2 (Tool augmentation)
 Expand the scope of the LLM pipeline by integrating various difficulty levels of problems and implementing tool integration. 
 
 We evaluate the system in two modes: a baseline setting that measures raw LLM performance, and a tool-augmented setting that incorporates external verification.
 Verilator is used in the augmented setting to provide faster, scriptable simulation, enabling quicker feedback and more efficient refinement of generated RTL.
+
+Phase 3 (Concept level memory):
+
+Using the ideas expressed in ArcMemo, we try to implement Concept level memory in our pipeline. 
 
 ---
 
@@ -97,6 +101,7 @@ References and inspirations:
 1. [Spec2rtl](https://research.nvidia.com/publication/2025-06_spec2rtl-agent-automated-hardware-code-generation-complex-specifications-using)
 2. [Evaluation Frameworks](https://www.evidentlyai.com/blog/llm-evaluation-framework)
 3. [Verilator](https://github.com/verilator/verilator)
+4. [ArcMemo](https://arxiv.org/abs/2509.04439)
 ---
 
 
