@@ -111,6 +111,24 @@ Verilator is used in the augmented setting to provide faster, scriptable simulat
 Phase 3 (Concept level memory):
 
 Using the ideas expressed in ArcMemo, we try to implement Concept level memory in our pipeline. 
+First, we construct two separate families of problems that share underlying computational patterns but differ in surface-level structure and interfaces.
+
+The families we decided on are:
+Family A: FSM-Controlled Streaming Datapath Systems
+   - P1: Signed adder / overflow
+   - P2: Running sum
+   - P3: Running product
+   - P4: Valid-gated pulse counter
+   - P5: Basic FIFO-style sequential buffer
+
+Family B: Memory-Centric State Systems
+   - P6: Stack (LIFO)
+   - P7: FIFO Queue
+   - P8: Circular Buffer / Sliding Window Sum
+   - P9: Register File
+   - P10: Priority Buffer / Scheduler
+
+We then run the baseline pipeline and identify recurring failure types like compiler based failure, state based failure, timing based failures to understand where the model consistently struggles.
 
 ---
 
