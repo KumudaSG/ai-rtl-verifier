@@ -137,6 +137,7 @@ References and inspirations:
 2. [Evaluation Frameworks](https://www.evidentlyai.com/blog/llm-evaluation-framework)
 3. [Verilator](https://github.com/verilator/verilator)
 4. [ArcMemo](https://arxiv.org/abs/2509.04439)
+5. [VerilogEval](https://github.com/NVlabs/verilog-eval)
 ---
 
 
